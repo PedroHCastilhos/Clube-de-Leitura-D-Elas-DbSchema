@@ -1,1 +1,5 @@
-Baixar o programa DBSchema e abrir o arquivo .dbs presente dentro do repositório. Ao alterá-lo, commitar e fazer push.
+## **Como usar?**
+
+- Baixar o programa DBSchema
+- Clonar o repositório e abrir o arquivo .dbs
+- Ao alterá-lo, fazer commit e push
