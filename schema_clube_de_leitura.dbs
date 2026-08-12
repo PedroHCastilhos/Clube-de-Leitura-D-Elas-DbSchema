@@ -204,9 +204,6 @@
 			<entity schema="db_clube_de_leitura" name="meeting_users" color="C1D8EE" x="627" y="266" />
 			<entity schema="db_clube_de_leitura" name="meetings" color="C1D8EE" x="722" y="437" />
 			<entity schema="db_clube_de_leitura" name="users" color="C1D8EE" x="57" y="266" />
-			<shape x="171" y="95" style="Rectangle" color="FF0000" >
-				<comment><![CDATA[oi pedro teste]]></comment>
-			</shape>
 		</diagram>
 	</diagram_group>
 </project>
