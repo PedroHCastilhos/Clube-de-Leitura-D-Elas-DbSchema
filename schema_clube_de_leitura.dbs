@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="Clube de Leitura D&#039;Elas" database="PostgreSQL" id="b1260f80-f6e5-4f15-87b1-3bb1e0c55cfb" >
+	<schema name="db_clube_de_leitura" >
+		<table name="book_ratings" prior="book_rating" >
+			<column name="id" type="uuid" mandatory="y" />
+			<column name="book_id" type="uuid" mandatory="y" />
+			<column name="rating" type="integer" mandatory="y" >
+				<column_options><![CDATA[1, 2, 3, 4, 5]]></column_options>
+			</column>
+			<column name="comment" type="varchar" length="1024" />
+			<index name="pk_book_rating" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unq_book_ratings_book_id" unique="UNIQUE_KEY" >
+				<column name="book_id" />
+			</index>
+		</table>
+		<table name="book_suggestions" prior="group_books" >
+			<column name="id" type="uuid" mandatory="y" />
+			<column name="book_id" type="uuid" mandatory="y" />
+			<column name="group_user_id" prior="user_id" type="uuid" mandatory="y" />
+			<column name="suggested_at" type="date" mandatory="y" />
+			<column name="book_status" type="ENUMERATION" mandatory="y" >
+				<defo><![CDATA['active']]></defo>
+				<column_options><![CDATA[active, draw]]></column_options>
+			</column>
+			<index name="pk_group_books" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unq_group_books_book_id" unique="UNIQUE_KEY" >
+				<column name="book_id" />
+			</index>
+			<index name="unq_book_suggestions_group_user_id" unique="UNIQUE_KEY" >
+				<column name="group_user_id" />
+			</index>
+		</table>
+		<table name="books" prior="livros" >
+			<column name="id" type="uuid" mandatory="y" />
+			<column name="name" prior="nome" type="varchar" length="100" mandatory="y" />
+			<column name="author" type="varchar" length="100" mandatory="y" />
+			<column name="publisher" type="varchar" length="100" mandatory="y" />
+			<column name="genre" type="varchar" length="50" mandatory="y" />
+			<index name="pk_livros" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_books_group_books" to_schema="db_clube_de_leitura" to_table="book_suggestions" >
+				<fk_column name="id" pk="book_id" />
+			</fk>
+			<fk name="fk_books_meetings" to_schema="db_clube_de_leitura" to_table="meetings" >
+				<fk_column name="id" pk="book_id" />
+			</fk>
+			<fk name="fk_books_book_ratings" to_schema="db_clube_de_leitura" to_table="book_ratings" options="" >
+				<fk_column name="id" pk="book_id" />
+			</fk>
+		</table>
+		<table name="cities" prior="tbl_0" >
+			<column name="id" type="uuid" mandatory="y" />
+			<column name="name" type="varchar" length="100" mandatory="y" />
+			<index name="pk_cities" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_cities_city_zones" to_schema="db_clube_de_leitura" to_table="city_zones" >
+				<fk_column name="id" pk="city_id" />
+			</fk>
+		</table>
+		<table name="city_zones" prior="city_" >
+			<column name="id" type="uuid" mandatory="y" />
+			<column name="name" type="varchar" length="30" mandatory="y" />
+			<column name="acronym" type="varchar" length="2" mandatory="y" />
+			<column name="city_id" type="uuid" mandatory="y" />
+			<index name="pk_city_zones" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unq_city_zones_city_id" unique="UNIQUE_KEY" >
+				<column name="city_id" />
+			</index>
+			<fk name="fk_city_zones_users" to_schema="db_clube_de_leitura" to_table="users" >
+				<fk_column name="id" pk="city_zone_id" />
+			</fk>
+			<fk name="fk_city_zones_groups" to_schema="db_clube_de_leitura" to_table="groups" >
+				<fk_column name="id" pk="city_zone_id" />
+			</fk>
+		</table>
+		<table name="group_users" prior="group_us" >
+			<column name="id" type="uuid" mandatory="y" />
+			<column name="group_id" type="integer" mandatory="y" />
+			<column name="user_id" type="uuid" mandatory="y" />
+			<column name="role" type="ENUMERATION" mandatory="y" >
+				<column_options><![CDATA[reader,coordinator,manager]]></column_options>
+			</column>
+			<column name="registration_status" prior="status" type="ENUMERATION" mandatory="y" >
+				<defo><![CDATA['pending']]></defo>
+				<column_options><![CDATA[pending, approved, rejected]]></column_options>
+			</column>
+			<index name="pk_group_users" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unq_group_users_group_id" unique="UNIQUE_KEY" >
+				<column name="group_id" />
+			</index>
+			<index name="unq_group_users_user_id" unique="UNIQUE_KEY" >
+				<column name="user_id" />
+			</index>
+			<fk name="fk_group_users_meeting_users" to_schema="db_clube_de_leitura" to_table="meeting_users" >
+				<fk_column name="id" pk="group_user_id" />
+			</fk>
+			<fk name="fk_group_users_meetings" to_schema="db_clube_de_leitura" to_table="meetings" >
+				<fk_column name="id" pk="host_id" />
+			</fk>
+			<fk name="fk_group_users_book_suggestions" to_schema="db_clube_de_leitura" to_table="book_suggestions" >
+				<fk_column name="id" pk="group_user_id" />
+			</fk>
+		</table>
+		<table name="groups" prior="gr" >
+			<column name="id" type="uuid" mandatory="y" />
+			<column name="number" type="integer" mandatory="y" />
+			<column name="city_zone_id" type="uuid" mandatory="y" />
+			<column name="description" type="text" />
+			<index name="pk_groups" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unq_groups_city_zone_id" unique="UNIQUE_KEY" >
+				<column name="city_zone_id" />
+			</index>
+			<fk name="fk_groups_group_users" to_schema="db_clube_de_leitura" to_table="group_users" >
+				<fk_column name="id" pk="group_id" />
+			</fk>
+			<fk name="fk_groups_meetings" to_schema="db_clube_de_leitura" to_table="meetings" >
+				<fk_column name="id" pk="group_id" />
+			</fk>
+		</table>
+		<table name="meeting_users" prior="meeting_u" >
+			<column name="id" type="uuid" mandatory="y" />
+			<column name="group_user_id" prior="user_id" type="uuid" mandatory="y" />
+			<column name="meeting_id" type="uuid" mandatory="y" />
+			<column name="presence_status" type="ENUMERATION" mandatory="y" >
+				<defo><![CDATA['pending']]></defo>
+				<column_options><![CDATA[pending, confirmed, declined, checked_in, no_show]]></column_options>
+			</column>
+			<index name="pk_meeting_users" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unq_meeting_users_user_id" unique="UNIQUE_KEY" >
+				<column name="group_user_id" />
+			</index>
+			<index name="unq_meeting_users_meeting_id" unique="UNIQUE_KEY" >
+				<column name="meeting_id" />
+			</index>
+		</table>
+		<table name="meetings" prior="tbl_0" >
+			<column name="id" type="uuid" mandatory="y" />
+			<column name="date" type="date" />
+			<column name="location" type="varchar" length="100" />
+			<column name="group_id" type="uuid" mandatory="y" />
+			<column name="host_id" type="uuid" />
+			<column name="book_id" type="uuid" />
+			<index name="pk_meetings" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unq_meetings_group_id" unique="UNIQUE_KEY" >
+				<column name="group_id" />
+			</index>
+			<index name="unq_meetings_host_id" unique="UNIQUE_KEY" >
+				<column name="host_id" />
+			</index>
+			<index name="unq_meetings_book_id" unique="UNIQUE_KEY" >
+				<column name="book_id" />
+			</index>
+			<fk name="fk_meetings_meeting_users" to_schema="db_clube_de_leitura" to_table="meeting_users" >
+				<fk_column name="id" pk="meeting_id" />
+			</fk>
+		</table>
+		<table name="tbl" />
+		<table name="users" prior="user" >
+			<column name="id" type="uuid" mandatory="y" />
+			<column name="name" type="varchar" length="100" mandatory="y" />
+			<column name="phone" type="varchar" length="11" mandatory="y" />
+			<column name="instagram" type="varchar" length="100" />
+			<column name="email" type="varchar" length="100" mandatory="y" />
+			<column name="birth_date" type="date" mandatory="y" />
+			<column name="job" type="varchar" length="100" />
+			<column name="level_of_education" type="varchar" length="50" />
+			<column name="city_zone_id" prior="city_id" type="uuid" mandatory="y" />
+			<index name="pk_u" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unq_users_city_zone_id" unique="UNIQUE_KEY" >
+				<column name="city_zone_id" />
+			</index>
+			<fk name="fk_users_group_users" to_schema="db_clube_de_leitura" to_table="group_users" >
+				<fk_column name="id" pk="user_id" />
+			</fk>
+		</table>
+	</schema>
+	<diagram_group name="Default" id="6d035a1a-c739-4f47-8fdd-089913d319f3" >
+		<diagram name="Default Diagram" id="1fe09fc1-73f4-48cf-a62c-ea278659e653" show_relation="columns" >
+			<entity schema="db_clube_de_leitura" name="book_ratings" color="C1D8EE" x="1102" y="380" />
+			<entity schema="db_clube_de_leitura" name="book_suggestions" color="C1D8EE" x="874" y="57" />
+			<entity schema="db_clube_de_leitura" name="books" color="C1D8EE" x="912" y="418" />
+			<entity schema="db_clube_de_leitura" name="cities" color="C1D8EE" x="456" y="494" />
+			<entity schema="db_clube_de_leitura" name="city_zones" color="C1D8EE" x="285" y="494" />
+			<entity schema="db_clube_de_leitura" name="group_users" color="C1D8EE" x="399" y="57" />
+			<entity schema="db_clube_de_leitura" name="groups" color="C1D8EE" x="418" y="266" />
+			<entity schema="db_clube_de_leitura" name="meeting_users" color="C1D8EE" x="627" y="266" />
+			<entity schema="db_clube_de_leitura" name="meetings" color="C1D8EE" x="722" y="437" />
+			<entity schema="db_clube_de_leitura" name="users" color="C1D8EE" x="57" y="266" />
+		</diagram>
+	</diagram_group>
+</project>
