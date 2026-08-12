@@ -137,6 +137,10 @@
 				<defo><![CDATA['pending']]></defo>
 				<column_options><![CDATA[pending, confirmed, declined, checked_in, no_show]]></column_options>
 			</column>
+			<column name="book_rating" type="integer" >
+				<column_options><![CDATA[1,2,3,4,5]]></column_options>
+			</column>
+			<column name="book_review" type="text" />
 			<index name="pk_meeting_users" unique="PRIMARY_KEY" >
 				<column name="id" />
 			</index>
@@ -194,15 +198,14 @@
 	</schema>
 	<diagram_group name="Default" id="6d035a1a-c739-4f47-8fdd-089913d319f3" >
 		<diagram name="Default Diagram" id="1fe09fc1-73f4-48cf-a62c-ea278659e653" show_relation="columns" >
-			<entity schema="db_clube_de_leitura" name="book_ratings" color="C1D8EE" x="1102" y="380" />
 			<entity schema="db_clube_de_leitura" name="book_suggestions" color="C1D8EE" x="874" y="57" />
-			<entity schema="db_clube_de_leitura" name="books" color="C1D8EE" x="912" y="418" />
-			<entity schema="db_clube_de_leitura" name="cities" color="C1D8EE" x="456" y="494" />
+			<entity schema="db_clube_de_leitura" name="books" color="C1D8EE" x="912" y="475" />
+			<entity schema="db_clube_de_leitura" name="cities" color="C1D8EE" x="456" y="513" />
 			<entity schema="db_clube_de_leitura" name="city_zones" color="C1D8EE" x="285" y="494" />
 			<entity schema="db_clube_de_leitura" name="group_users" color="C1D8EE" x="399" y="57" />
 			<entity schema="db_clube_de_leitura" name="groups" color="C1D8EE" x="418" y="266" />
-			<entity schema="db_clube_de_leitura" name="meeting_users" color="C1D8EE" x="627" y="266" />
-			<entity schema="db_clube_de_leitura" name="meetings" color="C1D8EE" x="722" y="437" />
+			<entity schema="db_clube_de_leitura" name="meeting_users" color="C1D8EE" x="627" y="190" />
+			<entity schema="db_clube_de_leitura" name="meetings" color="C1D8EE" x="665" y="437" />
 			<entity schema="db_clube_de_leitura" name="users" color="C1D8EE" x="57" y="266" />
 		</diagram>
 	</diagram_group>
