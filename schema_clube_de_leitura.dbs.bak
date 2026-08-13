@@ -40,6 +40,7 @@
 			<column name="author" type="varchar" length="100" mandatory="y" />
 			<column name="publisher" type="varchar" length="100" mandatory="y" />
 			<column name="genre" type="varchar" length="50" mandatory="y" />
+			<column name="external_id" type="uuid" mandatory="y" />
 			<index name="pk_livros" unique="PRIMARY_KEY" >
 				<column name="id" />
 			</index>
@@ -56,17 +57,24 @@
 		<table name="cities" prior="tbl_0" >
 			<column name="id" type="uuid" mandatory="y" />
 			<column name="name" type="varchar" length="100" mandatory="y" />
+			<column name="ibge_id" type="uuid" mandatory="y" />
 			<index name="pk_cities" unique="PRIMARY_KEY" >
 				<column name="id" />
 			</index>
 			<fk name="fk_cities_city_zones" to_schema="db_clube_de_leitura" to_table="city_zones" >
 				<fk_column name="id" pk="city_id" />
 			</fk>
+			<fk name="fk_cities_groups" to_schema="db_clube_de_leitura" to_table="groups" >
+				<fk_column name="id" pk="city_id" />
+			</fk>
+			<fk name="fk_cities_users" to_schema="db_clube_de_leitura" to_table="users" >
+				<fk_column name="id" pk="city_id" />
+			</fk>
 		</table>
 		<table name="city_zones" prior="city_" >
 			<column name="id" type="uuid" mandatory="y" />
-			<column name="name" type="varchar" length="30" mandatory="y" />
-			<column name="acronym" type="varchar" length="2" mandatory="y" />
+			<column name="name" type="varchar" length="30" />
+			<column name="acronym" type="varchar" length="2" />
 			<column name="city_id" type="uuid" mandatory="y" />
 			<index name="pk_city_zones" unique="PRIMARY_KEY" >
 				<column name="id" />
@@ -85,9 +93,7 @@
 			<column name="id" type="uuid" mandatory="y" />
 			<column name="group_id" type="integer" mandatory="y" />
 			<column name="user_id" type="uuid" mandatory="y" />
-			<column name="role" type="ENUMERATION" mandatory="y" >
-				<column_options><![CDATA[reader,coordinator,manager]]></column_options>
-			</column>
+			<column name="is_coordinator" prior="group_role" type="boolean" mandatory="y" />
 			<column name="registration_status" prior="status" type="ENUMERATION" mandatory="y" >
 				<defo><![CDATA['pending']]></defo>
 				<column_options><![CDATA[pending, approved, rejected]]></column_options>
@@ -110,11 +116,15 @@
 			<fk name="fk_group_users_book_suggestions" to_schema="db_clube_de_leitura" to_table="book_suggestions" >
 				<fk_column name="id" pk="group_user_id" />
 			</fk>
+			<fk name="fk_group_users_meeting_photos" to_schema="db_clube_de_leitura" to_table="meeting_photos" >
+				<fk_column name="id" pk="uploaded_by" />
+			</fk>
 		</table>
 		<table name="groups" prior="gr" >
 			<column name="id" type="uuid" mandatory="y" />
 			<column name="number" type="integer" mandatory="y" />
-			<column name="city_zone_id" type="uuid" mandatory="y" />
+			<column name="city_id" type="uuid" mandatory="y" />
+			<column name="city_zone_id" type="uuid" />
 			<column name="description" type="text" />
 			<index name="pk_groups" unique="PRIMARY_KEY" >
 				<column name="id" />
@@ -122,12 +132,46 @@
 			<index name="unq_groups_city_zone_id" unique="UNIQUE_KEY" >
 				<column name="city_zone_id" />
 			</index>
+			<index name="unq_groups_city_id" unique="UNIQUE_KEY" >
+				<column name="city_id" />
+			</index>
 			<fk name="fk_groups_group_users" to_schema="db_clube_de_leitura" to_table="group_users" >
 				<fk_column name="id" pk="group_id" />
 			</fk>
 			<fk name="fk_groups_meetings" to_schema="db_clube_de_leitura" to_table="meetings" >
 				<fk_column name="id" pk="group_id" />
 			</fk>
+		</table>
+		<table name="locations" prior="meeting_locations" >
+			<column name="id" type="uuid" mandatory="y" />
+			<column name="address" type="varchar" length="200" mandatory="y" />
+			<column name="google_place_id" prior="google_places_id" type="uuid" mandatory="y" />
+			<column name="name" type="varchar" length="100" />
+			<column name="latitude" type="double precision" />
+			<column name="longitude" type="double precision" />
+			<index name="pk_meeting_locations" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_meeting_locations_meetings" to_schema="db_clube_de_leitura" to_table="meetings" >
+				<fk_column name="id" pk="location_id" />
+			</fk>
+		</table>
+		<table name="meeting_photos" prior="meeting_pho" >
+			<column name="id" type="uuid" mandatory="y" />
+			<column name="url" prior="link" type="varchar" length="500" mandatory="y" />
+			<column name="file_extension" type="varchar" length="5" mandatory="y" />
+			<column name="uploaded_at" prior="uploaded_by" type="date" mandatory="y" />
+			<column name="uploaded_by" type="uuid" mandatory="y" />
+			<column name="meeting_id" type="uuid" mandatory="y" />
+			<index name="pk_meeting_photos" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="unq_meeting_photos_uploaded_by" unique="UNIQUE_KEY" >
+				<column name="uploaded_by" />
+			</index>
+			<index name="unq_meeting_photos_meeting_id" unique="UNIQUE_KEY" >
+				<column name="meeting_id" />
+			</index>
 		</table>
 		<table name="meeting_users" prior="meeting_u" >
 			<column name="id" type="uuid" mandatory="y" />
@@ -154,7 +198,7 @@
 		<table name="meetings" prior="tbl_0" >
 			<column name="id" type="uuid" mandatory="y" />
 			<column name="date" type="date" />
-			<column name="location" type="varchar" length="100" />
+			<column name="location_id" prior="location" type="uuid" />
 			<column name="group_id" type="uuid" mandatory="y" />
 			<column name="host_id" type="uuid" />
 			<column name="book_id" type="uuid" />
@@ -170,7 +214,13 @@
 			<index name="unq_meetings_book_id" unique="UNIQUE_KEY" >
 				<column name="book_id" />
 			</index>
+			<index name="unq_meetings_location_id" unique="UNIQUE_KEY" >
+				<column name="location_id" />
+			</index>
 			<fk name="fk_meetings_meeting_users" to_schema="db_clube_de_leitura" to_table="meeting_users" >
+				<fk_column name="id" pk="meeting_id" />
+			</fk>
+			<fk name="fk_meetings_meeting_photos" to_schema="db_clube_de_leitura" to_table="meeting_photos" >
 				<fk_column name="id" pk="meeting_id" />
 			</fk>
 		</table>
@@ -184,12 +234,19 @@
 			<column name="birth_date" type="date" mandatory="y" />
 			<column name="job" type="varchar" length="100" />
 			<column name="level_of_education" type="varchar" length="50" />
-			<column name="city_zone_id" prior="city_id" type="uuid" mandatory="y" />
+			<column name="city_id" type="uuid" mandatory="y" />
+			<column name="city_zone_id" prior="city_id" type="uuid" />
+			<column name="app_role" type="ENUMERATION" mandatory="y" >
+				<column_options><![CDATA[FOUNDER,MANAGER,READER]]></column_options>
+			</column>
 			<index name="pk_u" unique="PRIMARY_KEY" >
 				<column name="id" />
 			</index>
 			<index name="unq_users_city_zone_id" unique="UNIQUE_KEY" >
 				<column name="city_zone_id" />
+			</index>
+			<index name="unq_users_city_id" unique="UNIQUE_KEY" >
+				<column name="city_id" />
 			</index>
 			<fk name="fk_users_group_users" to_schema="db_clube_de_leitura" to_table="group_users" >
 				<fk_column name="id" pk="user_id" />
@@ -198,15 +255,17 @@
 	</schema>
 	<diagram_group name="Default" id="6d035a1a-c739-4f47-8fdd-089913d319f3" >
 		<diagram name="Default Diagram" id="1fe09fc1-73f4-48cf-a62c-ea278659e653" show_relation="columns" >
-			<entity schema="db_clube_de_leitura" name="book_suggestions" color="C1D8EE" x="874" y="57" />
-			<entity schema="db_clube_de_leitura" name="books" color="C1D8EE" x="912" y="475" />
-			<entity schema="db_clube_de_leitura" name="cities" color="C1D8EE" x="456" y="513" />
-			<entity schema="db_clube_de_leitura" name="city_zones" color="C1D8EE" x="285" y="494" />
-			<entity schema="db_clube_de_leitura" name="group_users" color="C1D8EE" x="399" y="57" />
-			<entity schema="db_clube_de_leitura" name="groups" color="C1D8EE" x="418" y="266" />
-			<entity schema="db_clube_de_leitura" name="meeting_users" color="C1D8EE" x="627" y="190" />
-			<entity schema="db_clube_de_leitura" name="meetings" color="C1D8EE" x="665" y="437" />
-			<entity schema="db_clube_de_leitura" name="users" color="C1D8EE" x="57" y="266" />
+			<entity schema="db_clube_de_leitura" name="book_suggestions" color="C1D8EE" x="855" y="57" />
+			<entity schema="db_clube_de_leitura" name="books" color="C1D8EE" x="1083" y="456" />
+			<entity schema="db_clube_de_leitura" name="cities" color="C1D8EE" x="247" y="399" />
+			<entity schema="db_clube_de_leitura" name="city_zones" color="C1D8EE" x="57" y="418" />
+			<entity schema="db_clube_de_leitura" name="group_users" color="C1D8EE" x="380" y="57" />
+			<entity schema="db_clube_de_leitura" name="groups" color="C1D8EE" x="399" y="266" />
+			<entity schema="db_clube_de_leitura" name="locations" color="C1D8EE" x="418" y="437" />
+			<entity schema="db_clube_de_leitura" name="meeting_photos" color="C1D8EE" x="855" y="342" />
+			<entity schema="db_clube_de_leitura" name="meeting_users" color="C1D8EE" x="608" y="190" />
+			<entity schema="db_clube_de_leitura" name="meetings" color="C1D8EE" x="646" y="437" />
+			<entity schema="db_clube_de_leitura" name="users" color="C1D8EE" x="133" y="57" />
 		</diagram>
 	</diagram_group>
 </project>
