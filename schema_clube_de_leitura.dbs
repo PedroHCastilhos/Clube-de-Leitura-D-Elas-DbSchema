@@ -93,7 +93,9 @@
 			<column name="id" type="uuid" mandatory="y" />
 			<column name="group_id" type="integer" mandatory="y" />
 			<column name="user_id" type="uuid" mandatory="y" />
-			<column name="is_coordinator" prior="group_role" type="boolean" mandatory="y" />
+			<column name="group_role" prior="is_coordinator" type="ENUMERATION" mandatory="y" >
+				<defo><![CDATA['READER']]></defo>
+			</column>
 			<column name="registration_status" prior="status" type="ENUMERATION" mandatory="y" >
 				<defo><![CDATA['pending']]></defo>
 				<column_options><![CDATA[pending, approved, rejected]]></column_options>

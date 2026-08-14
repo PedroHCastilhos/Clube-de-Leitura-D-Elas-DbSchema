@@ -73,8 +73,8 @@
 		</table>
 		<table name="city_zones" prior="city_" >
 			<column name="id" type="uuid" mandatory="y" />
-			<column name="name" type="varchar" length="30" />
-			<column name="acronym" type="varchar" length="2" />
+			<column name="name" type="varchar" length="30" mandatory="y" />
+			<column name="acronym" type="varchar" length="4" mandatory="y" />
 			<column name="city_id" type="uuid" mandatory="y" />
 			<index name="pk_city_zones" unique="PRIMARY_KEY" >
 				<column name="id" />
