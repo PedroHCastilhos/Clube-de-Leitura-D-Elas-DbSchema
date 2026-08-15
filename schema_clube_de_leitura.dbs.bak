@@ -93,8 +93,8 @@
 			<column name="id" type="uuid" mandatory="y" />
 			<column name="group_id" type="integer" mandatory="y" />
 			<column name="user_id" type="uuid" mandatory="y" />
-			<column name="group_role" prior="is_coordinator" type="ENUMERATION" mandatory="y" >
-				<defo><![CDATA['READER']]></defo>
+			<column name="is_coordinator" prior="group_role" type="boolean" mandatory="y" >
+				<defo><![CDATA[false]]></defo>
 			</column>
 			<column name="registration_status" prior="status" type="ENUMERATION" mandatory="y" >
 				<defo><![CDATA['pending']]></defo>
@@ -202,8 +202,8 @@
 			<column name="date" type="date" />
 			<column name="location_id" prior="location" type="uuid" />
 			<column name="group_id" type="uuid" mandatory="y" />
-			<column name="host_id" type="uuid" />
-			<column name="book_id" type="uuid" />
+			<column name="host_id" type="uuid" mandatory="y" />
+			<column name="book_id" type="uuid" mandatory="y" />
 			<index name="pk_meetings" unique="PRIMARY_KEY" >
 				<column name="id" />
 			</index>
